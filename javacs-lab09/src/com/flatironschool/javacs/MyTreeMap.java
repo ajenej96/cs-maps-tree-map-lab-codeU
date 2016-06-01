@@ -64,16 +64,27 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	private Node findNode(Object target) {
 		// some implementations can handle null as a key, but not this one
 		if (target == null) {
-            throw new NullPointerException();
-	    }
+            		throw new NullPointerException();
+	    	}
 		
 		// something to make the compiler happy
 		@SuppressWarnings("unchecked")
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
-		// the actual search
-        // TODO: Fill this in.
-        return null;
+		Node p = root;
+		while(p != null){
+			int cmp = k.compareTo(p.key);
+			if(cmp == 0){
+				return p;
+			}else if(cmp < 0){
+				p = p.left;
+			}else if(cmp > 0){
+				p = p.right;
+			}
+
+		}
+		return null;
+		
 	}
 
 	/**
@@ -92,6 +103,32 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
+		Node p = root;
+		while(p != null){
+			if(equals(target, p.value)){
+				return true;
+			}else if(p.left != null && equals(target, p.left.value)){
+				return true;
+			}else if(p.right != null && equals(target, p.right.value)){
+				return true;
+			}
+			p = p.left;
+
+		}
+		
+		Node pr = root;
+		while(pr != null){
+			if(equals(target, pr.value)){
+				return true;
+			}else if(pr.left != null && equals(target, pr.left.value)){
+				return true;
+			}else if(pr.right != null && equals(target, pr.right.value)){
+				return true;
+			}
+			
+			pr = pr.right;
+
+		}
 		return false;
 	}
 
@@ -117,7 +154,16 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+		keySet(root, set); 
+		return set;
+	}
+
+	public Set<K> keySet(Node node, Set<K> set ) {
+		if(node != null){
+			keySet(node.left, set); 
+			set.add(node.key);
+			keySet(node.right, set);
+		}
 		return set;
 	}
 
@@ -135,8 +181,37 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+        	if(get(key) != null){
+			V oldVal = get(key);
+			findNode(key).value = value;
+			return oldVal;
+		}else{
+			Node child = new Node(key, value);
+			Comparable<? super K> k = (Comparable<? super K>) child.key;
+			while(node != null){
+				int cmp = k.compareTo(node.key);
+				if(cmp == 0 && node.left == null){
+					node.left = child;
+					size++;
+					return null;
+				}else if(cmp < 0 && node.left == null){
+					node.left = child;
+					size++;
+					return null;
+				}else if( cmp > 0 && node.right == null){
+					node.right = child;
+					size++;
+					return null;
+				}else if(cmp < 0){
+					node = node.left;
+				}else if(cmp > 0){
+					node = node.right;
+				}
+
+			}
+        		return null;
+
+		}
 	}
 
 	@Override
